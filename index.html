@@ -1,1 +1,446 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title id="page-title">RobloxZone - Jogo</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&family=Baloo+2:wght@700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --red:#e03131; --red-dark:#c92a2a;
+      --bg:#0f0f1a; --panel:#1a1a2e;
+      --accent:#00b4d8; --text:#f0f0ff;
+      --muted:#888aaa; --border:#2a2a4a;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      font-family:'Nunito',sans-serif;
+      background:var(--bg); color:var(--text); min-height:100vh;
+    }
+    body::before {
+      content:''; position:fixed; inset:0;
+      background:radial-gradient(ellipse at 50% 0%, rgba(0,180,216,0.08) 0%, transparent 60%);
+      z-index:0; pointer-events:none;
+    }
 
+    nav {
+      position:sticky; top:0; z-index:100;
+      display:flex; align-items:center; justify-content:space-between;
+      padding:0 2rem; height:64px;
+      background:rgba(10,10,25,0.95);
+      border-bottom:1px solid var(--border);
+      backdrop-filter:blur(12px);
+    }
+    .nav-logo { display:flex; align-items:center; gap:10px; text-decoration:none; }
+    .nav-logo img { height:44px; object-fit:contain; }
+    .nav-logo-text { font-family:'Baloo 2',cursive; font-size:1.5rem; font-weight:800; color:var(--text); }
+    .nav-logo-text span { color:var(--red); }
+    .nav-right { display:flex; align-items:center; gap:1rem; }
+    .robux-badge {
+      display:flex; align-items:center; gap:8px;
+      background:linear-gradient(135deg,#1a3a1a,#0d2a0d);
+      border:1.5px solid #2a5a2a; border-radius:30px; padding:6px 16px;
+      font-weight:800; color:#50fa7b;
+    }
+    .back-btn {
+      display:flex; align-items:center; gap:6px;
+      padding:8px 16px; border-radius:10px;
+      background:var(--panel); border:1.5px solid var(--border);
+      color:var(--text); cursor:pointer;
+      font-family:'Nunito',sans-serif; font-weight:700; font-size:0.9rem;
+      text-decoration:none; transition:all 0.2s;
+    }
+    .back-btn:hover { border-color:var(--accent); color:var(--accent); }
+
+    main { position:relative; z-index:1; max-width:1100px; margin:0 auto; padding:2rem 1.5rem; }
+
+    /* HERO */
+    .game-hero {
+      border-radius:24px; overflow:hidden; position:relative;
+      height:380px; margin-bottom:2rem;
+      background:linear-gradient(135deg,#1a0a1a,#0a1a3a);
+      border:1.5px solid var(--border);
+      animation:fade-in 0.5s both;
+    }
+    @keyframes fade-in { from{opacity:0;transform:scale(0.98)} to{opacity:1;transform:scale(1)} }
+    .game-hero img {
+      width:100%; height:100%; object-fit:cover; opacity:0.5;
+    }
+    .hero-overlay {
+      position:absolute; inset:0;
+      background:linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.3) 60%, transparent 100%);
+      display:flex; align-items:flex-end; padding:2rem;
+    }
+    .hero-content { max-width:600px; }
+    .hero-badge {
+      display:inline-block;
+      background:var(--red); border-radius:6px;
+      padding:4px 12px; font-size:0.8rem; font-weight:800;
+      margin-bottom:10px; letter-spacing:0.5px;
+    }
+    .hero-title {
+      font-family:'Baloo 2',cursive;
+      font-size:3rem; font-weight:800; line-height:1.1;
+      margin-bottom:8px;
+    }
+    .hero-meta {
+      display:flex; align-items:center; gap:16px;
+      color:rgba(255,255,255,0.7); font-size:0.9rem; font-weight:700;
+    }
+
+    /* LAYOUT */
+    .game-layout { display:grid; grid-template-columns:1fr 340px; gap:2rem; }
+
+    /* INFO CARD */
+    .info-card {
+      background:var(--panel); border:1.5px solid var(--border);
+      border-radius:20px; padding:1.8rem;
+    }
+    .info-card h3 {
+      font-family:'Baloo 2',cursive; font-size:1.3rem; font-weight:800;
+      margin-bottom:1rem; color:var(--accent);
+    }
+    .info-card p { color:var(--muted); line-height:1.7; font-size:0.95rem; }
+    .stats-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:1.2rem; }
+    .stat-box {
+      background:rgba(255,255,255,0.03); border:1px solid var(--border);
+      border-radius:12px; padding:14px; text-align:center;
+    }
+    .stat-value { font-family:'Baloo 2',cursive; font-size:1.5rem; font-weight:800; color:var(--text); }
+    .stat-label { color:var(--muted); font-size:0.8rem; font-weight:700; margin-top:2px; }
+
+    /* PLAY CARD */
+    .play-card {
+      background:var(--panel); border:1.5px solid var(--border);
+      border-radius:20px; padding:1.8rem;
+      position:sticky; top:80px;
+      height:fit-content;
+    }
+    .play-card-thumb {
+      width:100%; aspect-ratio:16/9; border-radius:14px; overflow:hidden;
+      background:#0d1a2a; margin-bottom:1.2rem;
+    }
+    .play-card-thumb img { width:100%; height:100%; object-fit:cover; }
+    .play-card-thumb-placeholder {
+      width:100%; height:100%; display:flex; align-items:center;
+      justify-content:center; font-size:4rem;
+    }
+    .play-btn {
+      width:100%; padding:16px;
+      background:linear-gradient(135deg,#00c853,#00e676);
+      color:white; border:none; border-radius:14px;
+      font-family:'Baloo 2',cursive; font-size:1.3rem; font-weight:800;
+      cursor:pointer; transition:all 0.2s;
+      position:relative; overflow:hidden;
+      box-shadow:0 6px 20px rgba(0,200,80,0.4);
+    }
+    .play-btn:hover { transform:translateY(-3px); box-shadow:0 12px 30px rgba(0,200,80,0.5); }
+    .play-btn:active { transform:translateY(0); }
+    .play-btn::after {
+      content:''; position:absolute; inset:0;
+      background:linear-gradient(135deg,transparent,rgba(255,255,255,0.15));
+    }
+    .wishl-btn {
+      width:100%; padding:12px;
+      background:transparent; border:1.5px solid var(--border);
+      color:var(--text); border-radius:12px;
+      font-family:'Nunito',sans-serif; font-weight:800; font-size:0.95rem;
+      cursor:pointer; transition:all 0.2s; margin-top:10px;
+    }
+    .wishl-btn:hover { border-color:#ffd700; color:#ffd700; }
+    .play-note {
+      text-align:center; color:var(--muted); font-size:0.8rem;
+      margin-top:12px; font-weight:600;
+    }
+    .online-indicator {
+      display:flex; align-items:center; justify-content:center;
+      gap:6px; margin-bottom:1rem;
+      font-weight:800; font-size:0.9rem;
+    }
+    .green-dot { width:8px; height:8px; border-radius:50%; background:#50fa7b; animation:pulse 1.5s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+    /* SHOP MODAL */
+    .modal-overlay {
+      display:none; position:fixed; inset:0; z-index:1000;
+      background:rgba(0,0,0,0.85); backdrop-filter:blur(8px);
+      align-items:center; justify-content:center;
+    }
+    .modal-overlay.open { display:flex; animation:modal-in 0.3s both; }
+    @keyframes modal-in { from{opacity:0;transform:scale(0.95)} to{opacity:1;transform:scale(1)} }
+    .modal {
+      background:var(--panel); border:1.5px solid var(--border);
+      border-radius:24px; width:90%; max-width:600px;
+      max-height:85vh; overflow-y:auto;
+      padding:2rem;
+    }
+    .modal-header {
+      display:flex; align-items:center; justify-content:space-between;
+      margin-bottom:1.5rem;
+    }
+    .modal-title { font-family:'Baloo 2',cursive; font-size:1.8rem; font-weight:800; }
+    .modal-close {
+      background:rgba(255,255,255,0.1); border:none; border-radius:50%;
+      width:36px; height:36px; cursor:pointer; color:var(--text);
+      font-size:1.2rem; display:flex; align-items:center; justify-content:center;
+      transition:background 0.2s;
+    }
+    .modal-close:hover { background:var(--red); }
+    .modal-balance {
+      background:linear-gradient(135deg,#1a3a1a,#0d2a0d);
+      border:1.5px solid #2a5a2a; border-radius:14px;
+      padding:1rem 1.5rem; margin-bottom:1.5rem;
+      display:flex; align-items:center; justify-content:space-between;
+    }
+    .balance-label { color:var(--muted); font-weight:700; font-size:0.9rem; }
+    .balance-value { font-family:'Baloo 2',cursive; font-size:1.8rem; font-weight:800; color:#50fa7b; }
+    .shop-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:1.5rem; }
+    .shop-item {
+      background:rgba(255,255,255,0.03); border:1.5px solid var(--border);
+      border-radius:14px; padding:1rem; text-align:center;
+      transition:all 0.2s; cursor:pointer;
+    }
+    .shop-item:hover { border-color:var(--accent); transform:translateY(-2px); }
+    .shop-item-icon { font-size:2.5rem; margin-bottom:8px; }
+    .shop-item-name { font-weight:800; font-size:0.95rem; }
+    .shop-item-price { color:#50fa7b; font-weight:800; font-size:0.9rem; margin-top:4px; }
+    .shop-item-rarity {
+      font-size:0.72rem; font-weight:800;
+      padding:2px 8px; border-radius:4px;
+      display:inline-block; margin-top:4px;
+    }
+    .rarity-legendary { background:rgba(255,165,0,0.2); color:#ffa500; }
+    .rarity-epic { background:rgba(160,32,240,0.2); color:#bf5af2; }
+    .rarity-rare { background:rgba(0,180,216,0.2); color:var(--accent); }
+    .go-shop-btn {
+      width:100%; padding:14px;
+      background:linear-gradient(135deg,var(--accent),#0096c7);
+      color:white; border:none; border-radius:12px;
+      font-family:'Baloo 2',cursive; font-size:1.1rem; font-weight:700;
+      cursor:pointer; transition:all 0.2s;
+      box-shadow:0 4px 15px rgba(0,180,216,0.3);
+    }
+    .go-shop-btn:hover { transform:translateY(-2px); box-shadow:0 8px 25px rgba(0,180,216,0.4); }
+
+    @media(max-width:768px) {
+      .game-layout { grid-template-columns:1fr; }
+      .hero-title { font-size:2rem; }
+      .game-hero { height:250px; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="../index.html" class="nav-logo">
+    <img src="../images/logo.png" alt="Logo" onerror="this.style.display='none'">
+    <span class="nav-logo-text">Roblox<span>Zone</span></span>
+  </a>
+  <div class="nav-right">
+    <div class="robux-badge">💎 <span id="robux-nav">100,000,000 R$</span></div>
+    <a href="games.html" class="back-btn">← Voltar aos Jogos</a>
+  </div>
+</nav>
+
+<main>
+  <!-- HERO -->
+  <div class="game-hero" id="game-hero">
+    <img id="hero-img" src="" alt="" onerror="this.style.display='none'">
+    <div class="hero-overlay">
+      <div class="hero-content">
+        <div class="hero-badge" id="hero-badge">🔥 POPULAR</div>
+        <div class="hero-title" id="hero-title">Carregando...</div>
+        <div class="hero-meta">
+          <span>👥 <span id="hero-players">--</span> online</span>
+          <span>⭐ <span id="hero-rating">--</span></span>
+          <span>🏷️ <span id="hero-genre">--</span></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="game-layout">
+    <!-- LEFT: INFO -->
+    <div>
+      <div class="info-card">
+        <h3>📖 Sobre o Jogo</h3>
+        <p id="game-desc">Carregando descrição...</p>
+        <div class="stats-grid">
+          <div class="stat-box">
+            <div class="stat-value" id="stat-visits">--</div>
+            <div class="stat-label">Visitas Totais</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-value" id="stat-favorites">--</div>
+            <div class="stat-label">Favoritos</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-value" id="stat-created">--</div>
+            <div class="stat-label">Criado</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-value" id="stat-update">--</div>
+            <div class="stat-label">Atualizado</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: PLAY CARD -->
+    <div>
+      <div class="play-card">
+        <div class="play-card-thumb">
+          <img id="play-thumb" src="" alt="" onerror="this.style.display='none'">
+          <div class="play-card-thumb-placeholder" id="play-emoji" style="display:none">🎮</div>
+        </div>
+        <div class="online-indicator">
+          <div class="green-dot"></div>
+          <span id="play-online">-- jogadores online</span>
+        </div>
+        <button class="play-btn" onclick="openShop()">▶ JOGAR</button>
+        <button class="wishl-btn">⭐ Adicionar aos Favoritos</button>
+        <div class="play-note">Gratuito · Compras na loja disponíveis</div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- SHOP MODAL -->
+<div class="modal-overlay" id="shop-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">💎 Loja do Jogo</div>
+      <button class="modal-close" onclick="closeShop()">✕</button>
+    </div>
+    <div class="modal-balance">
+      <div>
+        <div class="balance-label">O teu saldo</div>
+        <div class="balance-value">100,000,000 R$</div>
+      </div>
+      <div style="font-size:2rem">💎</div>
+    </div>
+    <div class="shop-grid" id="shop-grid"></div>
+    <button class="go-shop-btn" onclick="goToRobloxShop()">🛒 Ir para a Loja Oficial →</button>
+  </div>
+</div>
+
+<script>
+const GAMES_DATA = {
+  'blox-fruits': {
+    name:'Blox Fruits', emoji:'🍎', genre:'Aventura', players:'2.3M', rating:'98%',
+    badge:'🔥 MAIS JOGADO', img:'../images/blox-fruits.png',
+    desc:'Explora mundos imensos, come frutas com poderes místicos e torna-te o pirata mais poderoso do mar! Combate outros jogadores e encontra frutas lendárias escondidas pelos mapas.',
+    visits:'38.2B', favorites:'12.8M', created:'2019', update:'2026',
+    shop:[
+      {icon:'🍇',name:'Gravity Fruit',price:'2,400 R$',rarity:'legendary'},
+      {icon:'🌋',name:'Magma Fruit',price:'850 R$',rarity:'epic'},
+      {icon:'⚓',name:'Espada Yama',price:'1,200 R$',rarity:'legendary'},
+      {icon:'🎭',name:'Máscara Rara',price:'300 R$',rarity:'rare'},
+    ]
+  },
+  'volleyball-legends': {
+    name:'Volleyball Legends', emoji:'🏐', genre:'Desporto', players:'450K', rating:'94%',
+    badge:'🏆 TOP DESPORTO', img:'../images/volleyball-legends.png',
+    desc:'O melhor jogo de volleyball do Roblox! Cria o teu jogador, treina habilidades incríveis e sobe os rankings mundiais. Joga com amigos em modo online multiplayer.',
+    visits:'4.1B', favorites:'2.1M', created:'2021', update:'2026',
+    shop:[
+      {icon:'🏆',name:'Troféu VIP',price:'500 R$',rarity:'epic'},
+      {icon:'👟',name:'Sapatilhas Pro',price:'200 R$',rarity:'rare'},
+      {icon:'🎽',name:'Jersey Lendária',price:'750 R$',rarity:'legendary'},
+      {icon:'⚡',name:'Boost de XP',price:'150 R$',rarity:'rare'},
+    ]
+  },
+  'brainrot-slap': {
+    name:'Brainrot Slap Tower', emoji:'🧠', genre:'Torre', players:'820K', rating:'91%',
+    badge:'✨ EM ALTA', img:'../images/brainrot-slap.png',
+    desc:'Sobrevive às ondas de personagens Brainrot e luta pela sobrevivência na torre mais caótica do Roblox! Chega ao topo e torna-te o campeão.',
+    visits:'1.8B', favorites:'890K', created:'2024', update:'2026',
+    shop:[
+      {icon:'👊',name:'Luva Suprema',price:'400 R$',rarity:'epic'},
+      {icon:'🧢',name:'Chapéu Brainrot',price:'250 R$',rarity:'rare'},
+      {icon:'💥',name:'Efeito Explosão',price:'600 R$',rarity:'legendary'},
+      {icon:'🛡️',name:'Escudo Especial',price:'350 R$',rarity:'rare'},
+    ]
+  },
+  'steal-brainrot': {
+    name:'Steal a Brainrot', emoji:'🤯', genre:'Ação', players:'310K', rating:'89%',
+    badge:'✨ NOVO', img:null,
+    desc:'Rouba os Brainrots dos outros jogadores antes que te roubem o teu! Um jogo caótico e divertido de estratégia e rapidez.',
+    visits:'520M', favorites:'280K', created:'2025', update:'2026',
+    shop:[
+      {icon:'🤯',name:'Brainrot Raro',price:'800 R$',rarity:'legendary'},
+      {icon:'🎣',name:'Cana de Pesca Pro',price:'300 R$',rarity:'epic'},
+      {icon:'💨',name:'Speed Boost',price:'200 R$',rarity:'rare'},
+      {icon:'🎭',name:'Disfarce Especial',price:'450 R$',rarity:'epic'},
+    ]
+  },
+};
+
+const DEFAULT_GAME = {
+  name:'Jogo', emoji:'🎮', genre:'Ação', players:'500K', rating:'90%',
+  badge:'🎮 POPULAR', img:null,
+  desc:'Divirte-te neste incrível jogo do Roblox com jogadores de todo o mundo!',
+  visits:'1B', favorites:'500K', created:'2023', update:'2026',
+  shop:[
+    {icon:'⚔️',name:'Arma Especial',price:'500 R$',rarity:'epic'},
+    {icon:'🎭',name:'Skin Rara',price:'350 R$',rarity:'rare'},
+    {icon:'💎',name:'Item Lendário',price:'1000 R$',rarity:'legendary'},
+    {icon:'⚡',name:'Power-Up',price:'200 R$',rarity:'rare'},
+  ]
+};
+
+// Auth guard
+if (!localStorage.getItem('rz_logged')) window.location.href = '../index.html';
+
+const gameId = localStorage.getItem('rz_current_game') || 'blox-fruits';
+const game = GAMES_DATA[gameId] || DEFAULT_GAME;
+
+// Fill page
+document.title = 'RobloxZone - ' + game.name;
+document.getElementById('hero-title').textContent = game.name;
+document.getElementById('hero-badge').textContent = game.badge;
+document.getElementById('hero-players').textContent = game.players;
+document.getElementById('hero-rating').textContent = game.rating;
+document.getElementById('hero-genre').textContent = game.genre;
+document.getElementById('game-desc').textContent = game.desc;
+document.getElementById('stat-visits').textContent = game.visits;
+document.getElementById('stat-favorites').textContent = game.favorites;
+document.getElementById('stat-created').textContent = game.created;
+document.getElementById('stat-update').textContent = game.update;
+document.getElementById('play-online').textContent = game.players + ' online';
+
+if (game.img) {
+  document.getElementById('hero-img').src = game.img;
+  document.getElementById('play-thumb').src = game.img;
+} else {
+  document.getElementById('play-thumb').style.display = 'none';
+  const ep = document.getElementById('play-emoji');
+  ep.style.display = 'flex';
+  ep.textContent = game.emoji;
+}
+
+// Shop grid
+const rarityClass = { legendary:'rarity-legendary', epic:'rarity-epic', rare:'rarity-rare' };
+document.getElementById('shop-grid').innerHTML = game.shop.map(item => `
+  <div class="shop-item">
+    <div class="shop-item-icon">${item.icon}</div>
+    <div class="shop-item-name">${item.name}</div>
+    <div class="shop-item-price">💎 ${item.price}</div>
+    <div class="shop-item-rarity ${rarityClass[item.rarity]}">${item.rarity.toUpperCase()}</div>
+  </div>
+`).join('');
+
+function openShop() { document.getElementById('shop-modal').classList.add('open'); }
+function closeShop() { document.getElementById('shop-modal').classList.remove('open'); }
+
+function goToRobloxShop() {
+  window.open('https://www.roblox.com/catalog', '_blank');
+}
+
+// Close on overlay click
+document.getElementById('shop-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeShop();
+});
+</script>
+</body>
+</html>
